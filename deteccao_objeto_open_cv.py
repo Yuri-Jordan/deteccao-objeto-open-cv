@@ -1,28 +1,39 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[16]:
+# In[1]:
 
 
 import cv2, numpy, os
 
 
-# In[69]:
+# In[2]:
 
 
-pathFrames = r'\assets\caxorrimFrames'
-#pathFrames = r'\assets\dogDriftFrames'
+#pathFrames = r'\assets\caxorrimFrames'
+pathFrames = r'\assets\dogDriftFrames'
 #pathFrames = r'\assets\gatoPiscinaFrames'
 diretorioFrames = os.getcwd() + pathFrames
+diretorioFramesFiltrados = os.getcwd() + r'\assets\output'
 
 
-# In[70]:
+# In[3]:
 
 
 foregroundModel = cv2.createBackgroundSubtractorMOG2()
+frameEmProcessamento = ''
+
+# variáveis relacionadas a função manter_objetos_tamanho_significante 
+limiarTamanhoObjeto = 100
+
+# variáveis relacionadas a gravação de imagens com movimentos 
+minimaQuantidadeDeFrames = 2
+arrayMovimentoDetectado = []
+arrayCapturaDeFrames = []
+idxFrameAtual = 0
 
 
-# In[71]:
+# In[4]:
 
 
 def reduzir_ruidos(foregroundMask):
@@ -30,11 +41,33 @@ def reduzir_ruidos(foregroundMask):
     return cv2.morphologyEx(numpy.float32(foregroundMask), cv2.MORPH_OPEN, morf)
 
 
-# In[75]:
+# In[5]:
 
 
-def manter_objetos_significantes(foregroundMask):
-    limiar = 100
+def frames_sao_consecutivos(arrayMovimentoDetectados):
+    return arrayMovimentoDetectado[-1] > arrayMovimentoDetectado[-2] + 1
+
+
+# In[6]:
+
+
+def salvar_sequencia(arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioFramesFiltrados):
+    print(diretorioFramesFiltrados)
+    if len(arrayCapturaDeFrames) < minimaQuantidadeDeFrames:
+        pass
+    else:
+        frameSequenciaAtual = 1
+        for frame in arrayCapturaDeFrames:
+            nomeImagem = str(idxFrameAtual) + '_' + str(frameSequenciaAtual) + '.jpg'
+            outPath = os.path.join(diretorioFramesFiltrados, nomeImagem)
+            cv2.imwrite(outPath, frame)
+            frameSequenciaAtual += 1
+
+
+# In[7]:
+
+
+def manter_objetos_tamanho_significante(foregroundMask):
     a, componentes_conectados = cv2.connectedComponents(numpy.array(foregroundMask > 0, numpy.uint8))
     imagemForeground = numpy.zeros(componentes_conectados.shape)<0
     componentes_unicos = numpy.unique(componentes_conectados.flatten())
@@ -44,39 +77,54 @@ def manter_objetos_significantes(foregroundMask):
             continue
         else:
             componente_conectado = componentes_conectados == componente
-            if numpy.sum(componente_conectado) > limiar:
+            if numpy.sum(componente_conectado) > limiarTamanhoObjeto:
                 imagemForeground = imagemForeground | componente_conectado
     return numpy.uint8(255*imagemForeground)
 
 
-# In[73]:
+# In[8]:
 
 
-def aplicar_mascara(frame):
-    foregroundMask = foregroundModel.apply(frame)
+def processar_imagem(arrayMovimentoDetectado, arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioFramesFiltrados):
+    foregroundMask = foregroundModel.apply(frameEmProcessamento)
     foregroundMask = reduzir_ruidos(foregroundMask)
-    foregroundMask = manter_objetos_significantes(foregroundMask)
-    matrizVazia = numpy.zeros(frame.shape, numpy.uint8)
+    foregroundMask = manter_objetos_tamanho_significante(foregroundMask)
+    
+    
+    if numpy.sum(foregroundMask) > 0:
+        arrayMovimentoDetectado.append(idxFrameAtual)
+        arrayCapturaDeFrames.append(frameEmProcessamento)
+        
+    if len(arrayMovimentoDetectado) >= 2 and frames_sao_consecutivos(arrayMovimentoDetectado):
+        salvar_sequencia(arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioFramesFiltrados)
+        arrayMovimentoDetectado = []
+        arrayCapturaDeFrames = []
+    
+    
+    matrizVazia = numpy.zeros(frameEmProcessamento.shape, numpy.uint8)
     matrizVazia[:,:,0], matrizVazia[:,:,1], matrizVazia[:,:,2] = foregroundMask, foregroundMask, foregroundMask
-    frameConcat = numpy.hstack((frame, matrizVazia))
+    frameConcat = numpy.hstack((frameEmProcessamento, matrizVazia))
     return frameConcat
 
 
-# In[74]:
+# In[9]:
 
 
 for nomeframe in os.listdir(diretorioFrames): 
     
+    idxFrameAtual += 1
+    
     caminhoFrame = os.path.join(diretorioFrames, nomeframe)
     
-    frame = cv2.imread(caminhoFrame)
-    frame = cv2.resize(frame, dsize=(600, 400))
-    frameConcat = aplicar_mascara(frame)
+    frameEmProcessamento = cv2.imread(caminhoFrame)
+    frameEmProcessamento = cv2.resize(frameEmProcessamento, dsize=(600, 400))
+    frameConcat = processar_imagem(arrayMovimentoDetectado, arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioFramesFiltrados)
     
     
     cv2.imshow('Teste', frameConcat)
     cv2.waitKey(20)
     
+salvar_sequencia(arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioFramesFiltrados)
 cv2.destroyAllWindows()
 
 

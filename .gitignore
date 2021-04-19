@@ -54,3 +54,4 @@ geckodriver.log
 
 # copied changelog
 docs/source/changelog.md
+assets/output/*.jpg

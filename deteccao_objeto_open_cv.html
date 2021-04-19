@@ -14259,7 +14259,7 @@ a.anchor-link {
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[16]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">cv2</span><span class="o">,</span> <span class="nn">numpy</span><span class="o">,</span> <span class="nn">os</span>
@@ -14273,13 +14273,14 @@ a.anchor-link {
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[69]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pathFrames</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\assets\caxorrimFrames&#39;</span>
-<span class="c1">#pathFrames = r&#39;\assets\dogDriftFrames&#39;</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#pathFrames = r&#39;\assets\caxorrimFrames&#39;</span>
+<span class="n">pathFrames</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\assets\dogDriftFrames&#39;</span>
 <span class="c1">#pathFrames = r&#39;\assets\gatoPiscinaFrames&#39;</span>
 <span class="n">diretorioFrames</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="n">pathFrames</span>
+<span class="n">diretorioFramesFiltrados</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;\assets\output&#39;</span>
 </pre></div>
 
      </div>
@@ -14290,10 +14291,20 @@ a.anchor-link {
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[70]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">foregroundModel</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">createBackgroundSubtractorMOG2</span><span class="p">()</span>
+<span class="n">frameEmProcessamento</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+<span class="c1"># variáveis relacionadas a função manter_objetos_tamanho_significante </span>
+<span class="n">limiarTamanhoObjeto</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="c1"># variáveis relacionadas a gravação de imagens com movimentos </span>
+<span class="n">minimaQuantidadeDeFrames</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">arrayMovimentoDetectado</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">arrayCapturaDeFrames</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">idxFrameAtual</span> <span class="o">=</span> <span class="mi">0</span>
 </pre></div>
 
      </div>
@@ -14304,7 +14315,7 @@ a.anchor-link {
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[71]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">reduzir_ruidos</span><span class="p">(</span><span class="n">foregroundMask</span><span class="p">):</span>
@@ -14320,11 +14331,49 @@ a.anchor-link {
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[75]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">manter_objetos_significantes</span><span class="p">(</span><span class="n">foregroundMask</span><span class="p">):</span>
-    <span class="n">limiar</span> <span class="o">=</span> <span class="mi">100</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">frames_sao_consecutivos</span><span class="p">(</span><span class="n">arrayMovimentoDetectados</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">arrayMovimentoDetectado</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">arrayMovimentoDetectado</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">salvar_sequencia</span><span class="p">(</span><span class="n">arrayCapturaDeFrames</span><span class="p">,</span> <span class="n">idxFrameAtual</span><span class="p">,</span> <span class="n">minimaQuantidadeDeFrames</span><span class="p">,</span> <span class="n">diretorioFramesFiltrados</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">diretorioFramesFiltrados</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arrayCapturaDeFrames</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">minimaQuantidadeDeFrames</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">frameSequenciaAtual</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">arrayCapturaDeFrames</span><span class="p">:</span>
+            <span class="n">nomeImagem</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">idxFrameAtual</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">frameSequenciaAtual</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.jpg&#39;</span>
+            <span class="n">outPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">diretorioFramesFiltrados</span><span class="p">,</span> <span class="n">nomeImagem</span><span class="p">)</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+            <span class="n">frameSequenciaAtual</span> <span class="o">+=</span> <span class="mi">1</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">manter_objetos_tamanho_significante</span><span class="p">(</span><span class="n">foregroundMask</span><span class="p">):</span>
     <span class="n">a</span><span class="p">,</span> <span class="n">componentes_conectados</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">connectedComponents</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">foregroundMask</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
     <span class="n">imagemForeground</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">componentes_conectados</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">0</span>
     <span class="n">componentes_unicos</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">componentes_conectados</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
@@ -14334,7 +14383,7 @@ a.anchor-link {
             <span class="k">continue</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">componente_conectado</span> <span class="o">=</span> <span class="n">componentes_conectados</span> <span class="o">==</span> <span class="n">componente</span>
-            <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">componente_conectado</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">limiar</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">componente_conectado</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">limiarTamanhoObjeto</span><span class="p">:</span>
                 <span class="n">imagemForeground</span> <span class="o">=</span> <span class="n">imagemForeground</span> <span class="o">|</span> <span class="n">componente_conectado</span>
     <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="mi">255</span><span class="o">*</span><span class="n">imagemForeground</span><span class="p">)</span>
 </pre></div>
@@ -14347,16 +14396,28 @@ a.anchor-link {
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[73]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">aplicar_mascara</span><span class="p">(</span><span class="n">frame</span><span class="p">):</span>
-    <span class="n">foregroundMask</span> <span class="o">=</span> <span class="n">foregroundModel</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">processar_imagem</span><span class="p">(</span><span class="n">arrayMovimentoDetectado</span><span class="p">,</span> <span class="n">arrayCapturaDeFrames</span><span class="p">,</span> <span class="n">idxFrameAtual</span><span class="p">,</span> <span class="n">minimaQuantidadeDeFrames</span><span class="p">,</span> <span class="n">diretorioFramesFiltrados</span><span class="p">):</span>
+    <span class="n">foregroundMask</span> <span class="o">=</span> <span class="n">foregroundModel</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">frameEmProcessamento</span><span class="p">)</span>
     <span class="n">foregroundMask</span> <span class="o">=</span> <span class="n">reduzir_ruidos</span><span class="p">(</span><span class="n">foregroundMask</span><span class="p">)</span>
-    <span class="n">foregroundMask</span> <span class="o">=</span> <span class="n">manter_objetos_significantes</span><span class="p">(</span><span class="n">foregroundMask</span><span class="p">)</span>
-    <span class="n">matrizVazia</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="n">foregroundMask</span> <span class="o">=</span> <span class="n">manter_objetos_tamanho_significante</span><span class="p">(</span><span class="n">foregroundMask</span><span class="p">)</span>
+    
+    
+    <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">foregroundMask</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">arrayMovimentoDetectado</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idxFrameAtual</span><span class="p">)</span>
+        <span class="n">arrayCapturaDeFrames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frameEmProcessamento</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arrayMovimentoDetectado</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">frames_sao_consecutivos</span><span class="p">(</span><span class="n">arrayMovimentoDetectado</span><span class="p">):</span>
+        <span class="n">salvar_sequencia</span><span class="p">(</span><span class="n">arrayCapturaDeFrames</span><span class="p">,</span> <span class="n">idxFrameAtual</span><span class="p">,</span> <span class="n">minimaQuantidadeDeFrames</span><span class="p">,</span> <span class="n">diretorioFramesFiltrados</span><span class="p">)</span>
+        <span class="n">arrayMovimentoDetectado</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">arrayCapturaDeFrames</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    
+    <span class="n">matrizVazia</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">frameEmProcessamento</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
     <span class="n">matrizVazia</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">matrizVazia</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">matrizVazia</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">foregroundMask</span><span class="p">,</span> <span class="n">foregroundMask</span><span class="p">,</span> <span class="n">foregroundMask</span>
-    <span class="n">frameConcat</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">frame</span><span class="p">,</span> <span class="n">matrizVazia</span><span class="p">))</span>
+    <span class="n">frameConcat</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">frameEmProcessamento</span><span class="p">,</span> <span class="n">matrizVazia</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">frameConcat</span>
 </pre></div>
 
@@ -14365,30 +14426,57 @@ a.anchor-link {
 </div>
 </div>
 
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[74]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">nomeframe</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">diretorioFrames</span><span class="p">):</span> 
     
+    <span class="n">idxFrameAtual</span> <span class="o">+=</span> <span class="mi">1</span>
+    
     <span class="n">caminhoFrame</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">diretorioFrames</span><span class="p">,</span> <span class="n">nomeframe</span><span class="p">)</span>
     
-    <span class="n">frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">caminhoFrame</span><span class="p">)</span>
-    <span class="n">frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">dsize</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">400</span><span class="p">))</span>
-    <span class="n">frameConcat</span> <span class="o">=</span> <span class="n">aplicar_mascara</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="n">frameEmProcessamento</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">caminhoFrame</span><span class="p">)</span>
+    <span class="n">frameEmProcessamento</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">frameEmProcessamento</span><span class="p">,</span> <span class="n">dsize</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">400</span><span class="p">))</span>
+    <span class="n">frameConcat</span> <span class="o">=</span> <span class="n">processar_imagem</span><span class="p">(</span><span class="n">arrayMovimentoDetectado</span><span class="p">,</span> <span class="n">arrayCapturaDeFrames</span><span class="p">,</span> <span class="n">idxFrameAtual</span><span class="p">,</span> <span class="n">minimaQuantidadeDeFrames</span><span class="p">,</span> <span class="n">diretorioFramesFiltrados</span><span class="p">)</span>
     
     
     <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s1">&#39;Teste&#39;</span><span class="p">,</span> <span class="n">frameConcat</span><span class="p">)</span>
     <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
     
+<span class="n">salvar_sequencia</span><span class="p">(</span><span class="n">arrayCapturaDeFrames</span><span class="p">,</span> <span class="n">idxFrameAtual</span><span class="p">,</span> <span class="n">minimaQuantidadeDeFrames</span><span class="p">,</span> <span class="n">diretorioFramesFiltrados</span><span class="p">)</span>
 <span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
 </pre></div>
 
      </div>
 </div>
 </div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>C:\Users\home\Desktop\dev\ufrn\ComputerVision\assets\output
+C:\Users\home\Desktop\dev\ufrn\ComputerVision\assets\output
+C:\Users\home\Desktop\dev\ufrn\ComputerVision\assets\output
+C:\Users\home\Desktop\dev\ufrn\ComputerVision\assets\output
+</pre>
+</div>
+</div>
+
+</div>
+
 </div>
 
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
