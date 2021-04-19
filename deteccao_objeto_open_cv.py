@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[21]:
 
 
 import cv2, numpy, os
 
 
-# In[2]:
+# In[22]:
 
 
 #pathFrames = r'\assets\caxorrimFrames'
@@ -17,7 +17,7 @@ diretorioFrames = os.getcwd() + pathFrames
 diretorioFramesFiltrados = os.getcwd() + r'\assets\output'
 
 
-# In[3]:
+# In[23]:
 
 
 foregroundModel = cv2.createBackgroundSubtractorMOG2()
@@ -33,7 +33,7 @@ arrayCapturaDeFrames = []
 idxFrameAtual = 0
 
 
-# In[4]:
+# In[24]:
 
 
 def reduzir_ruidos(foregroundMask):
@@ -41,18 +41,18 @@ def reduzir_ruidos(foregroundMask):
     return cv2.morphologyEx(numpy.float32(foregroundMask), cv2.MORPH_OPEN, morf)
 
 
-# In[5]:
+# In[14]:
 
 
 def frames_sao_consecutivos(arrayMovimentoDetectados):
     return arrayMovimentoDetectado[-1] > arrayMovimentoDetectado[-2] + 1
 
 
-# In[6]:
+# In[15]:
 
 
 def salvar_sequencia(arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioFramesFiltrados):
-    print(diretorioFramesFiltrados)
+
     if len(arrayCapturaDeFrames) < minimaQuantidadeDeFrames:
         pass
     else:
@@ -64,7 +64,7 @@ def salvar_sequencia(arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFram
             frameSequenciaAtual += 1
 
 
-# In[7]:
+# In[16]:
 
 
 def manter_objetos_tamanho_significante(foregroundMask):
@@ -82,7 +82,7 @@ def manter_objetos_tamanho_significante(foregroundMask):
     return numpy.uint8(255*imagemForeground)
 
 
-# In[8]:
+# In[17]:
 
 
 def processar_imagem(arrayMovimentoDetectado, arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioFramesFiltrados):
@@ -107,7 +107,7 @@ def processar_imagem(arrayMovimentoDetectado, arrayCapturaDeFrames, idxFrameAtua
     return frameConcat
 
 
-# In[9]:
+# In[18]:
 
 
 for nomeframe in os.listdir(diretorioFrames): 
@@ -128,10 +128,24 @@ salvar_sequencia(arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, 
 cv2.destroyAllWindows()
 
 
-# In[ ]:
+# ## Ler resultado do processamento 
+
+# In[27]:
 
 
-
+for nomeframe in os.listdir(diretorioFramesFiltrados): 
+    
+    
+    
+    caminhoFrame = os.path.join(diretorioFramesFiltrados, nomeframe)
+    
+    frame = cv2.imread(caminhoFrame)
+    frame = cv2.resize(frame, dsize=(600, 400))    
+    
+    cv2.imshow('Resultado', frame)
+    cv2.waitKey(20)
+    
+cv2.destroyAllWindows()
 
 
 # In[ ]:
