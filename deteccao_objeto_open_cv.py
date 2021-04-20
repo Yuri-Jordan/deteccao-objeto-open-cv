@@ -1,23 +1,25 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[21]:
+# In[15]:
 
 
 import cv2, numpy, os
+import cvlib as cv
+from cvlib.object_detection import draw_bbox
 
 
-# In[22]:
+# In[16]:
 
 
 #pathFrames = r'\assets\caxorrimFrames'
-pathFrames = r'\assets\dogDriftFrames'
-#pathFrames = r'\assets\gatoPiscinaFrames'
+#pathFrames = r'\assets\dogDriftFrames'
+pathFrames = r'\assets\gatoPiscinaFrames'
 diretorioFrames = os.getcwd() + pathFrames
 diretorioFramesFiltrados = os.getcwd() + r'\assets\output'
 
 
-# In[23]:
+# In[17]:
 
 
 foregroundModel = cv2.createBackgroundSubtractorMOG2()
@@ -33,7 +35,7 @@ arrayCapturaDeFrames = []
 idxFrameAtual = 0
 
 
-# In[24]:
+# In[18]:
 
 
 def reduzir_ruidos(foregroundMask):
@@ -41,14 +43,14 @@ def reduzir_ruidos(foregroundMask):
     return cv2.morphologyEx(numpy.float32(foregroundMask), cv2.MORPH_OPEN, morf)
 
 
-# In[14]:
+# In[19]:
 
 
 def frames_sao_consecutivos(arrayMovimentoDetectados):
     return arrayMovimentoDetectado[-1] > arrayMovimentoDetectado[-2] + 1
 
 
-# In[15]:
+# In[20]:
 
 
 def salvar_sequencia(arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioFramesFiltrados):
@@ -60,11 +62,13 @@ def salvar_sequencia(arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFram
         for frame in arrayCapturaDeFrames:
             nomeImagem = str(idxFrameAtual) + '_' + str(frameSequenciaAtual) + '.jpg'
             outPath = os.path.join(diretorioFramesFiltrados, nomeImagem)
+            bbox, labels, conf = cv.detect_common_objects(frame)
+            frame = draw_bbox(frame, bbox, labels, conf)
             cv2.imwrite(outPath, frame)
             frameSequenciaAtual += 1
 
 
-# In[16]:
+# In[21]:
 
 
 def manter_objetos_tamanho_significante(foregroundMask):
@@ -82,7 +86,7 @@ def manter_objetos_tamanho_significante(foregroundMask):
     return numpy.uint8(255*imagemForeground)
 
 
-# In[17]:
+# In[22]:
 
 
 def processar_imagem(arrayMovimentoDetectado, arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioFramesFiltrados):
@@ -107,7 +111,7 @@ def processar_imagem(arrayMovimentoDetectado, arrayCapturaDeFrames, idxFrameAtua
     return frameConcat
 
 
-# In[18]:
+# In[23]:
 
 
 for nomeframe in os.listdir(diretorioFrames): 
@@ -135,7 +139,8 @@ cv2.destroyAllWindows()
 
 for nomeframe in os.listdir(diretorioFramesFiltrados): 
     
-    
+    if(nomeframe == r'.gitkeep'):
+        continue
     
     caminhoFrame = os.path.join(diretorioFramesFiltrados, nomeframe)
     
@@ -143,7 +148,7 @@ for nomeframe in os.listdir(diretorioFramesFiltrados):
     frame = cv2.resize(frame, dsize=(600, 400))    
     
     cv2.imshow('Resultado', frame)
-    cv2.waitKey(20)
+    cv2.waitKey(150)
     
 cv2.destroyAllWindows()
 
