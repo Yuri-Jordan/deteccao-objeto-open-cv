@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[15]:
+# In[1]:
 
 
 import cv2, numpy, os
@@ -9,17 +9,17 @@ import cvlib as cv
 from cvlib.object_detection import draw_bbox
 
 
-# In[16]:
+# In[2]:
 
 
-#pathFrames = r'\assets\caxorrimFrames'
-#pathFrames = r'\assets\dogDriftFrames'
-pathFrames = r'\assets\gatoPiscinaFrames'
-diretorioFrames = os.getcwd() + pathFrames
-diretorioFramesFiltrados = os.getcwd() + r'\assets\output'
+#pathVideo = r'\assets\Caxorrim corajoso.mp4'
+pathVideo = r'\assets\DogDrift.mp4'
+#pathVideo = r'\assets\Gato Piscina.mp4'
+diretorioVideo = os.getcwd() + pathVideo
+diretorioVideoProcessado = os.getcwd() + r'\assets\output'
 
 
-# In[17]:
+# In[3]:
 
 
 foregroundModel = cv2.createBackgroundSubtractorMOG2()
@@ -35,7 +35,7 @@ arrayCapturaDeFrames = []
 idxFrameAtual = 0
 
 
-# In[18]:
+# In[4]:
 
 
 def reduzir_ruidos(foregroundMask):
@@ -43,14 +43,14 @@ def reduzir_ruidos(foregroundMask):
     return cv2.morphologyEx(numpy.float32(foregroundMask), cv2.MORPH_OPEN, morf)
 
 
-# In[19]:
+# In[5]:
 
 
 def frames_sao_consecutivos(arrayMovimentoDetectados):
     return arrayMovimentoDetectado[-1] > arrayMovimentoDetectado[-2] + 1
 
 
-# In[20]:
+# In[6]:
 
 
 def salvar_sequencia(arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioFramesFiltrados):
@@ -68,7 +68,7 @@ def salvar_sequencia(arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFram
             frameSequenciaAtual += 1
 
 
-# In[21]:
+# In[7]:
 
 
 def manter_objetos_tamanho_significante(foregroundMask):
@@ -86,7 +86,7 @@ def manter_objetos_tamanho_significante(foregroundMask):
     return numpy.uint8(255*imagemForeground)
 
 
-# In[22]:
+# In[8]:
 
 
 def processar_imagem(arrayMovimentoDetectado, arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioFramesFiltrados):
@@ -111,46 +111,69 @@ def processar_imagem(arrayMovimentoDetectado, arrayCapturaDeFrames, idxFrameAtua
     return frameConcat
 
 
-# In[23]:
+# In[11]:
 
 
-for nomeframe in os.listdir(diretorioFrames): 
+esc = 27
+cap = cv2.VideoCapture(diretorioVideo)
+
+if (cap.isOpened()== False): 
+  print("Erro ao abrir o vídeo")
+
+while(cap.isOpened()):
+
+  success, frame = cap.read()
+  if success == True:
     
     idxFrameAtual += 1
     
-    caminhoFrame = os.path.join(diretorioFrames, nomeframe)
-    
-    frameEmProcessamento = cv2.imread(caminhoFrame)
+    frameEmProcessamento = frame
     frameEmProcessamento = cv2.resize(frameEmProcessamento, dsize=(600, 400))
-    frameConcat = processar_imagem(arrayMovimentoDetectado, arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioFramesFiltrados)
-    
-    
-    cv2.imshow('Teste', frameConcat)
-    cv2.waitKey(20)
-    
-salvar_sequencia(arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioFramesFiltrados)
+    frameConcat = processar_imagem(arrayMovimentoDetectado, arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioVideoProcessado)
+
+    #cv2.imshow('Frame', frameConcat)
+
+    # Aperte esc para sair
+    key = cv2.waitKey(80)
+    if key == 27:
+        break
+
+  else: 
+    break
+
+cap.release()
+#salvar_sequencia(arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioVideoProcessado)
 cv2.destroyAllWindows()
 
 
 # ## Ler resultado do processamento 
 
-# In[27]:
+# In[12]:
 
 
-for nomeframe in os.listdir(diretorioFramesFiltrados): 
+esc = 27
+for nomeframe in os.listdir(diretorioVideoProcessado): 
     
     if(nomeframe == r'.gitkeep'):
         continue
     
-    caminhoFrame = os.path.join(diretorioFramesFiltrados, nomeframe)
+    caminhoFrame = os.path.join(diretorioVideoProcessado, nomeframe)
     
     frame = cv2.imread(caminhoFrame)
     frame = cv2.resize(frame, dsize=(600, 400))    
     
     cv2.imshow('Resultado', frame)
-    cv2.waitKey(150)
+    key = cv2.waitKey(80)
+    if key == 27:
+        break
     
 cv2.destroyAllWindows()
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
