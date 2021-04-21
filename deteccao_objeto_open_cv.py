@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 import cv2, numpy, os
@@ -9,7 +9,7 @@ import cvlib as cv
 from cvlib.object_detection import draw_bbox
 
 
-# In[2]:
+# In[ ]:
 
 
 #pathVideo = r'\assets\Caxorrim corajoso.mp4'
@@ -19,7 +19,7 @@ diretorioVideo = os.getcwd() + pathVideo
 diretorioVideoProcessado = os.getcwd() + r'\assets\output'
 
 
-# In[3]:
+# In[ ]:
 
 
 foregroundModel = cv2.createBackgroundSubtractorMOG2()
@@ -35,7 +35,7 @@ arrayCapturaDeFrames = []
 idxFrameAtual = 0
 
 
-# In[4]:
+# In[ ]:
 
 
 def reduzir_ruidos(foregroundMask):
@@ -43,14 +43,14 @@ def reduzir_ruidos(foregroundMask):
     return cv2.morphologyEx(numpy.float32(foregroundMask), cv2.MORPH_OPEN, morf)
 
 
-# In[5]:
+# In[ ]:
 
 
 def frames_sao_consecutivos(arrayMovimentoDetectados):
     return arrayMovimentoDetectado[-1] > arrayMovimentoDetectado[-2] + 1
 
 
-# In[6]:
+# In[ ]:
 
 
 def salvar_sequencia(arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioFramesFiltrados):
@@ -68,7 +68,7 @@ def salvar_sequencia(arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFram
             frameSequenciaAtual += 1
 
 
-# In[7]:
+# In[ ]:
 
 
 def manter_objetos_tamanho_significante(foregroundMask):
@@ -86,7 +86,7 @@ def manter_objetos_tamanho_significante(foregroundMask):
     return numpy.uint8(255*imagemForeground)
 
 
-# In[8]:
+# In[ ]:
 
 
 def processar_imagem(arrayMovimentoDetectado, arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioFramesFiltrados):
@@ -111,7 +111,7 @@ def processar_imagem(arrayMovimentoDetectado, arrayCapturaDeFrames, idxFrameAtua
     return frameConcat
 
 
-# In[11]:
+# In[ ]:
 
 
 esc = 27
@@ -142,13 +142,12 @@ while(cap.isOpened()):
     break
 
 cap.release()
-#salvar_sequencia(arrayCapturaDeFrames, idxFrameAtual, minimaQuantidadeDeFrames, diretorioVideoProcessado)
 cv2.destroyAllWindows()
 
 
 # ## Ler resultado do processamento 
 
-# In[12]:
+# In[ ]:
 
 
 esc = 27
