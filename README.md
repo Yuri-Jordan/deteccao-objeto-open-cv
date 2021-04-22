@@ -68,7 +68,7 @@ Para facilitar o processo de instalação do das bibliotecas e utilização do J
 ![alt text](/assets/readme/install-c.png)
 
 
-Instale as bibliotecas necessárias.
+Instale as bibliotecas necessárias (instale a cvlib e depois o tensorflow).
 
 * pip3
   ```sh
@@ -82,12 +82,12 @@ Instale as bibliotecas necessárias.
 
 * pip3
   ```sh
-  pip3 install tensorflow
+  pip3 install cvlib
   ```
 
 * pip3
   ```sh
-  pip3 install cvlib
+  pip3 install tensorflow
   ```
 
 ### Instalação
